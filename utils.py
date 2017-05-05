@@ -8,7 +8,7 @@ def extract_questions_from_dataframe(questions_dataframe, config, word2idx,
     if prediction_mode:
         loaded_file = _load_dataframe_from_file('extracted_questions_test.npz')
         if loaded_file:
-            return loaded_file['questions_A'], loaded_file['questions_B']
+            return loaded_file['questions_A'], loaded_file['questions_B'], None
     else:
         loaded_file = _load_dataframe_from_file('extracted_questions_train.npz')
         if loaded_file:
@@ -66,7 +66,7 @@ def extract_questions_from_dataframe(questions_dataframe, config, word2idx,
 def _load_dataframe_from_file(file_path):
     try:
         # Try to load previously preprocessed data
-        loaded_file = np.load('extracted_questions.npz')
+        loaded_file = np.load(file_path)
         print('{num} preprocessed questions loaded from disk'.format(
             num=len(loaded_file['questions_A'])))
         return loaded_file
