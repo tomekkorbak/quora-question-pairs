@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import re
 from keras.preprocessing.sequence import pad_sequences
 
 
@@ -21,11 +22,11 @@ def extract_questions_from_dataframe(questions_dataframe, config, word2idx,
     for i, row in questions_dataframe.iterrows():
         question_A = str(row['question1'])
         question_B = str(row['question2'])
-        if not prediction_mode and \
-                config.MAX_SENTENCE_LENGTH and \
-                (len(question_A) < config.MAX_SENTENCE_LENGTH or
-                 len(question_B) < config.MAX_SENTENCE_LENGTH):
-            continue
+        # if not prediction_mode and \
+        #         config.MAX_SENTENCE_LENGTH and \
+        #         (len(question_A) < config.MAX_SENTENCE_LENGTH or
+        #          len(question_B) < config.MAX_SENTENCE_LENGTH):
+        #     continue
         questions_A.append(question_A)
         questions_B.append(question_B)
         if 'is_duplicate' in row:
@@ -76,12 +77,30 @@ def _load_dataframe_from_file(file_path):
 
 
 def clean(questions):
-    # TODO
-    # punctuation_chars = set(punctuation)
-    # punctuation_chars.remove('"')
-    # punctuation = set(punctuation)
-    # questions = [q.split() for q in questions]
-    return [q.split() for q in questions]
+    cleaned_questions = []
+    for text in questions:
+        text = text.lower()
+        text = re.sub(r"[^A-Za-z0-9^,!.\/'+-=]", " ", text)
+        text = re.sub(r"what's", "what is ", text)
+        text = re.sub(r"\'s", " ", text)
+        text = re.sub(r"\'ve", " have ", text)
+        text = re.sub(r"can't", "cannot ", text)
+        text = re.sub(r"n't", " not ", text)
+        text = re.sub(r"i'm", "i am ", text)
+        text = re.sub(r"\'re", " are ", text)
+        text = re.sub(r"\'d", " would ", text)
+        text = re.sub(r"\'ll", " will ", text)
+        text = re.sub(r",", " ", text)
+        text = re.sub(r"\.", " ", text)
+        text = re.sub(r"!", " ! ", text)
+        text = re.sub(r"\/", " ", text)
+        text = re.sub(r"\^", " ^ ", text)
+        text = re.sub(r"\+", " + ", text)
+        text = re.sub(r"\-", " - ", text)
+        text = re.sub(r"\=", " = ", text)
+        text = re.sub(r"'", " ", text)
+        cleaned_questions.append(text.split())
+    return cleaned_questions
 
 
 def cast_to_word_indices(questions, word2idx, config):
@@ -111,7 +130,7 @@ def load_embeddings(file_path, config):
 
 
 def save_submission(predictions, config):
-    predictions = np.rint(predictions.ravel()).astype(np.int)
+    predictions = predictions.ravel()
     submission = pd.DataFrame({'is_duplicate': predictions})
     submission.to_csv(
         path_or_buf=config.stamp(comment='1') + '.csv',
