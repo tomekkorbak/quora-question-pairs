@@ -1,6 +1,6 @@
 # quora-question-pairs
 
-These repo contains models by the team of @360er0 and @tomekkorbak as they participated in [Quora question pairs](https://www.kaggle.com/c/quora-question-pairs) Kaggle contest.
+This repo contains models by the team of @360er0 and @tomekkorbak as they participated in [Quora question pairs](https://www.kaggle.com/c/quora-question-pairs) Kaggle contest.
 
 
 | id | leaderboard log loss| description | team member |
